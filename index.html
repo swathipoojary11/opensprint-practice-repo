@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crazy Feature</title>
+    <style>
+        * { margin: 0; padding: 0; }
+        body { background: #000; font-family: Arial; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="c"></canvas>
+    <script>
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+        
+        let particles = [];
+        
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 8;
+                this.vy = (Math.random() - 0.5) * 8;
+                this.life = 1;
+                this.hue = Math.random() * 360;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.2; // gravity
+                this.life -= 0.02;
+            }
+            draw() {
+                ctx.fillStyle = `hsla(${this.hue}, 100%, 50%, ${this.life})`;
+                ctx.fillRect(this.x, this.y, 5, 5);
+            }
+        }
+        
+        document.addEventListener('mousemove', e => {
+            if (Math.random() > 0.7) {
+                for (let i = 0; i < 3; i++) {
+                    particles.push(new Particle(e.clientX, e.clientY));
+                }
+            }
+        });
+        
+        document.addEventListener('click', e => {
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle(e.clientX, e.clientY));
+            }
+        });
+        
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            particles = particles.filter(p => p.life > 0);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        window.addEventListener('resize', () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+        });
+    </script>
+</body>
+</html>
